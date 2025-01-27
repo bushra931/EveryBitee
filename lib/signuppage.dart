@@ -109,7 +109,7 @@ class _SignUpState extends State<SignUp> {
           ),
           Positioned.fill(
             child: Container(
-                color: const Color.fromARGB(255, 72, 63, 16).withOpacity(0.5)),
+                color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.6)),
           ),
           Center(
             child: SingleChildScrollView(
@@ -123,7 +123,7 @@ class _SignUpState extends State<SignUp> {
                       child: Text(
                         "Create a new account",
                         style: GoogleFonts.ebGaramond(
-                          color: const Color.fromARGB(255, 5, 100, 26),
+                          color: const Color.fromARGB(255, 182, 225, 192),
                           fontSize: 25,
                           fontWeight: FontWeight.w300,
                         ),
