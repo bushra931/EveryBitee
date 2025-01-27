@@ -162,6 +162,7 @@ class _SignUpState extends State<SignUp> {
                             dropdownColor: Colors.black,
                             decoration: const InputDecoration(
                               labelText: 'Gender',
+                              prefixIcon: Icon(Icons.people_alt_sharp),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white),
                                 borderRadius: BorderRadius.horizontal(
@@ -226,6 +227,7 @@ class _SignUpState extends State<SignUp> {
                             dropdownColor: Colors.black,
                             decoration: const InputDecoration(
                               labelText: 'Dietary Preference',
+                              prefixIcon: Icon(Icons.local_hospital),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white),
                                 borderRadius: BorderRadius.horizontal(
