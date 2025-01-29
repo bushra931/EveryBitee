@@ -1,4 +1,6 @@
 import 'package:everybite/bottomnav.dart';
+import 'package:everybite/editpage.dart';
+import 'package:everybite/homepage.dart';
 import 'package:everybite/loginpage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,7 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   User? user;
   String profilePicUrl = "";
-  String userName = "Loading...";
+  String userName = "Bushra";
 
   @override
   void initState() {
@@ -29,16 +31,24 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Fetch user data from Firestore
   void _getUserData() async {
-    user = _auth.currentUser;
+    user = _auth.currentUser; // Fetch the current logged-in user
     if (user != null) {
+      // Using the user's UID to fetch the profile data from Firestore
       DocumentSnapshot userDoc =
           await _firestore.collection('users').doc(user!.uid).get();
       if (userDoc.exists) {
         setState(() {
-          userName = userDoc['name'];
-          profilePicUrl = userDoc['profilePicture'] ?? "";
+          userName = userDoc['full_name']; // Set username from Firestore data
+          profilePicUrl =
+              userDoc['profilePicture'] ?? ""; // Set profile picture URL
         });
       }
+    } else {
+      // If no user is logged in, navigate to login page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
     }
   }
 
@@ -49,7 +59,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (image != null) {
       File file = File(image.path);
-      String fileName = "profile_${user!.uid}.jpg";
+      String fileName =
+          "profile_${user!.uid}.jpg"; // Unique profile picture name
 
       try {
         TaskSnapshot uploadTask =
@@ -57,11 +68,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
         String downloadUrl = await uploadTask.ref.getDownloadURL();
         await _firestore.collection('users').doc(user!.uid).update({
-          'profilePicture': downloadUrl,
+          'profilePicture':
+              downloadUrl, // Update profile picture URL in Firestore
         });
 
         setState(() {
-          profilePicUrl = downloadUrl;
+          profilePicUrl = downloadUrl; // Set the updated profile picture URL
         });
       } catch (e) {
         print("Error uploading: $e");
@@ -70,10 +82,13 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void navigateToHomePage(BuildContext context) {
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => Homepage()),
-    // );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) => Homepage(
+                userId: user!.uid,
+              )),
+    );
   }
 
   void navigateToProfilePage(BuildContext context) {
@@ -109,8 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   radius: 50,
                   backgroundImage: profilePicUrl.isNotEmpty
                       ? NetworkImage(profilePicUrl)
-                      : AssetImage("assets/default_profile.png")
-                          as ImageProvider,
+                      : AssetImage("assets/image/4.png") as ImageProvider,
                 ),
               ),
               SizedBox(height: 10),
@@ -121,7 +135,15 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               SizedBox(height: 20),
               // Buttons
-              _buildProfileButton("Edit Personal Details", Icons.edit, () {}),
+              _buildProfileButton("Edit Personal Details", Icons.edit, () {
+                // Navigating to EditProfile page when the button is pressed
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EditProfile(userId: user!.uid), // Pass userId
+                    ));
+              }),
               _buildProfileButton("Terms and Policy", Icons.description, () {}),
               _buildProfileButton("Sign Out", Icons.logout, _signOut),
             ],

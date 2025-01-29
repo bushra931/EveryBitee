@@ -1,3 +1,4 @@
+import 'package:everybite/profilepage.dart';
 import 'package:everybite/splashscreen1.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
@@ -5,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:vibration/vibration.dart';
 import 'package:everybite/bottomnav.dart';
-
 
 class Homepage extends StatefulWidget {
   final String userId;
@@ -17,7 +17,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   String scannedBarcode = "";
-void navigateToHomePage(BuildContext context) {
+  void navigateToHomePage(BuildContext context) {
     // Navigator.pushReplacement(
     //   context,
     //   MaterialPageRoute(builder: (context) => Homepage()),
@@ -25,11 +25,12 @@ void navigateToHomePage(BuildContext context) {
   }
 
   void navigateToProfilePage(BuildContext context) {
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => ProfilePage()),
-    // );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ProfilePage()),
+    );
   }
+
   Future<void> scanBarcode() async {
     // Request camera permission
     var status = await Permission.camera.request();
@@ -98,7 +99,7 @@ void navigateToHomePage(BuildContext context) {
                       "Unlock the power of nutrition with just a scan. Discover the real value of every product, right at your fingertips!",
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        fontSize: 25,
+                        fontSize: 22,
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
                       ),
@@ -106,8 +107,8 @@ void navigateToHomePage(BuildContext context) {
                   ),
                 ),
                 Positioned(
-                  top: 350,
-                  left: 40,
+                  top: 260,
+                  left: 20,
                   child: ElevatedButton.icon(
                     onPressed: scanBarcode,
                     icon: const Icon(Icons.qr_code_scanner),
@@ -119,7 +120,7 @@ void navigateToHomePage(BuildContext context) {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 10),
+                          horizontal: 45, vertical: 10),
                     ),
                   ),
                 ),
