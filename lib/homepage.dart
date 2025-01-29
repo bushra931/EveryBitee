@@ -1,3 +1,6 @@
+import 'package:everybite/bottomnav.dart';
+import 'package:everybite/profilepage.dart';
+import 'package:everybite/scannerscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,6 +14,43 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  String scannedBarcode = "";
+  void navigateToHomePage(BuildContext context) {
+    // Navigator.pushReplacement(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => Homepage()),
+    // );
+  }
+
+  void navigateToProfilePage(BuildContext context) {
+    // Navigator.pushReplacement(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => ProfilePage()),
+    // );
+  }
+
+  Future<void> scanBarcode() async {
+    try {
+      var result = await BarcodeScanner.scan();
+      if (result.rawContent.isNotEmpty) {
+        navigateToAnalysisScreen(result.rawContent);
+      }
+    } catch (e) {
+      setState(() {
+        scannedBarcode = "Failed to scan barcode: $e";
+      });
+    }
+  }
+
+  void navigateToAnalysisScreen(String barcode) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BarcodeAnalysisScreen(barcode: barcode),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,25 +155,10 @@ class _HomepageState extends State<Homepage> {
           ),
 
           // Bottom Navigation Bar
-          BottomNavigationBar(
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.eco),
-                label: 'Explore',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
-            selectedItemColor: Colors.green,
-            unselectedItemColor: Colors.grey,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
+          CustomBottomNavBar(
+            currentIndex: 0, // Profile Tab Index
+            navigateToHomePage: () => navigateToHomePage(context),
+            navigateToProfilePage: () => navigateToProfilePage(context),
           ),
         ],
       ),
