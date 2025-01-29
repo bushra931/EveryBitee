@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 import 'package:everybite/scannerscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
+=======
+import 'package:flutter/material.dart';
+>>>>>>> upstream/main
 import 'package:google_fonts/google_fonts.dart';
 
 class Homepage extends StatefulWidget {
@@ -12,6 +16,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+<<<<<<< HEAD
   String scannedBarcode = "";
 
   Future<void> scanBarcode() async {
@@ -36,6 +41,8 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
+=======
+>>>>>>> upstream/main
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,12 +51,20 @@ class _HomepageState extends State<Homepage> {
         children: [
           // Top Section
           Container(
+<<<<<<< HEAD
             height: MediaQuery.of(context).size.height /
                 2, // Set height to half the screen
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.lightGreen[200],
               borderRadius: const BorderRadius.only(
+=======
+            height: 300,
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.lightGreen[200],
+              borderRadius: BorderRadius.only(
+>>>>>>> upstream/main
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),
               ),
@@ -58,23 +73,40 @@ class _HomepageState extends State<Homepage> {
                   color: Colors.black.withOpacity(0.2),
                   spreadRadius: 4,
                   blurRadius: 10,
+<<<<<<< HEAD
                   offset: const Offset(0, 10), // Shadow direction
+=======
+                  offset: Offset(0, 10), // Shadow direction
+>>>>>>> upstream/main
                 ),
               ],
             ),
             child: Stack(
               children: [
                 // Text in the left corner
+<<<<<<< HEAD
                 const Positioned(
                   top: 35,
                   left: 20,
                   child: SizedBox(
                     width: 200,
+=======
+                Positioned(
+                  top: 35,
+                  left: 20,
+                  child: SizedBox(
+                    width:
+                        200, // Adjust width to control the text container size
+>>>>>>> upstream/main
                     child: Text(
                       "Unlock the power of nutrition with just a scan. Discover the real value of every product, right at your fingertips!",
                       textAlign: TextAlign.left,
                       style: TextStyle(
+<<<<<<< HEAD
                         fontSize: 25,
+=======
+                        fontSize: 18,
+>>>>>>> upstream/main
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
                       ),
@@ -83,20 +115,36 @@ class _HomepageState extends State<Homepage> {
                 ),
                 // Scan button below the text
                 Positioned(
+<<<<<<< HEAD
                   top: 350,
                   left: 40,
                   child: ElevatedButton.icon(
                     onPressed: scanBarcode,
                     icon: const Icon(Icons.qr_code_scanner),
                     label: const Text("Scan Now"),
+=======
+                  top: 190, // Adjust position to appear below the text
+                  left: 40,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      // Add your scan action here
+                    },
+                    icon: Icon(Icons.qr_code_scanner),
+                    label: Text("Scan Now"),
+>>>>>>> upstream/main
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.green,
                       backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
+<<<<<<< HEAD
                       padding: const EdgeInsets.symmetric(
                           horizontal: 30, vertical: 10),
+=======
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+>>>>>>> upstream/main
                     ),
                   ),
                 ),
@@ -114,7 +162,11 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
 
+<<<<<<< HEAD
           // Display Scanned Barcode
+=======
+          // Middle Section with image and text
+>>>>>>> upstream/main
           Expanded(
             child: Center(
               child: Column(
@@ -125,10 +177,17 @@ class _HomepageState extends State<Homepage> {
                     width: 150,
                     height: 150,
                   ),
+<<<<<<< HEAD
                   const SizedBox(height: 20),
                   Text(
                     "Scan, Discover, Nourish!",
                     style: const TextStyle(
+=======
+                  SizedBox(height: 20),
+                  Text(
+                    "Scan, Discover, Nourish!",
+                    style: TextStyle(
+>>>>>>> upstream/main
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -138,10 +197,16 @@ class _HomepageState extends State<Homepage> {
               ),
             ),
           ),
+<<<<<<< HEAD
 
           // Bottom Navigation Bar
           BottomNavigationBar(
             items: const [
+=======
+          // Bottom Navigation Bar
+          BottomNavigationBar(
+            items: [
+>>>>>>> upstream/main
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Home',

@@ -85,5 +85,9 @@ class DefaultFirebaseOptions {
     storageBucket: 'everybite-ba3f2.firebasestorage.app',
     measurementId: 'G-Z9MRN1T9VR',
   );
+<<<<<<< HEAD
 
 }
+=======
+}
+>>>>>>> upstream/main
