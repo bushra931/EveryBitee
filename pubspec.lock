@@ -81,6 +81,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.0"
+<<<<<<< HEAD
   cross_file:
     dependency: transitive
     description:
@@ -89,6 +90,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.4+2"
+=======
+>>>>>>> 75b8efa7064d734ab2ace78e74b9d1f065b414b3
   crypto:
     dependency: transitive
     description:
