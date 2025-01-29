@@ -9,7 +9,8 @@ class SplashScreen extends StatelessWidget {
 
   const SplashScreen({Key? key, required this.barcode}) : super(key: key);
 
-  Future<void> navigateToAnalysisScreen(BuildContext context, String barcode) async {
+  Future<void> navigateToAnalysisScreen(
+      BuildContext context, String barcode) async {
     final product = await fetchProduct(barcode);
     // After the result is ready, navigate to the analysis screen
     Navigator.pushReplacement(
@@ -41,7 +42,18 @@ class SplashScreen extends StatelessWidget {
 
     return Scaffold(
       body: Center(
-        child: CircularProgressIndicator(),
+        child:Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children:[
+            Image.asset(
+              'assets/image/burger.png', // Path to your burger image
+              height: 100,  // Adjust the size as needed
+              width: 100,
+            ),
+            const SizedBox(height: 20), // Space between the image and loader
+            CircularProgressIndicator(),  // Loading spinner
+          ],
+        ),
       ),
     );
   }

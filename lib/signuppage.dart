@@ -126,7 +126,7 @@ class _SignUpState extends State<SignUp> {
 
           // Navigate to Userprofile
         
-=======
+//=======
           
         }
       }

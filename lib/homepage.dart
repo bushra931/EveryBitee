@@ -1,11 +1,11 @@
 import 'package:everybite/profilepage.dart';
-import 'package:everybite/splashscreen1.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:vibration/vibration.dart';
 import 'package:everybite/bottomnav.dart';
+import 'package:everybite/splashscreen1.dart';
 
 class Homepage extends StatefulWidget {
   final String userId;
@@ -126,11 +126,11 @@ class _HomepageState extends State<Homepage> {
                 ),
                 Positioned(
                   bottom: -110,
-                  right: 20,
+                  right: 50,
                   child: Image.asset(
-                    'assets/image/3.png', // Replace with your image path
-                    height: 500,
-                    width: 105,
+                    'assets/image/wrap.png', // Replace with your image path
+                    height: 530,
+                    width: 120,
                   ),
                 ),
               ],
@@ -144,7 +144,7 @@ class _HomepageState extends State<Homepage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset(
-                    'assets/image/2.png', // Replace with your image path
+                    'assets/image/cornny.png', // Replace with your image path
                     width: 150,
                     height: 150,
                   ),
@@ -152,7 +152,7 @@ class _HomepageState extends State<Homepage> {
                   Text(
                     "Scan, Discover, Nourish!",
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
