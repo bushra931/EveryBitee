@@ -1,9 +1,11 @@
-import 'package:everybite/bottomnav.dart';
-import 'package:everybite/profilepage.dart';
-import 'package:everybite/scannerscreen.dart';
+import 'package:everybite/splashscreen1.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:vibration/vibration.dart';
+import 'package:everybite/bottomnav.dart';
+
 
 class Homepage extends StatefulWidget {
   final String userId;
@@ -15,7 +17,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   String scannedBarcode = "";
-  void navigateToHomePage(BuildContext context) {
+void navigateToHomePage(BuildContext context) {
     // Navigator.pushReplacement(
     //   context,
     //   MaterialPageRoute(builder: (context) => Homepage()),
@@ -28,27 +30,36 @@ class _HomepageState extends State<Homepage> {
     //   MaterialPageRoute(builder: (context) => ProfilePage()),
     // );
   }
-
   Future<void> scanBarcode() async {
-    try {
-      var result = await BarcodeScanner.scan();
-      if (result.rawContent.isNotEmpty) {
-        navigateToAnalysisScreen(result.rawContent);
+    // Request camera permission
+    var status = await Permission.camera.request();
+
+    if (status.isGranted) {
+      try {
+        var result = await BarcodeScanner.scan();
+        if (result.rawContent.isNotEmpty) {
+          // Vibrate on successful scan
+          if (await Vibration.hasVibrator()) {
+            Vibration.vibrate(duration: 500); // 500ms vibration
+          }
+          // Transition to splash screen while loading result
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SplashScreen(barcode: result.rawContent),
+            ),
+          );
+        }
+      } catch (e) {
+        setState(() {
+          scannedBarcode = "Failed to scan barcode: $e";
+        });
       }
-    } catch (e) {
+    } else {
       setState(() {
-        scannedBarcode = "Failed to scan barcode: $e";
+        scannedBarcode = "Camera permission denied!";
       });
     }
-  }
-
-  void navigateToAnalysisScreen(String barcode) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BarcodeAnalysisScreen(barcode: barcode),
-      ),
-    );
   }
 
   @override
@@ -59,8 +70,7 @@ class _HomepageState extends State<Homepage> {
         children: [
           // Top Section
           Container(
-            height: MediaQuery.of(context).size.height /
-                2, // Set height to half the screen
+            height: MediaQuery.of(context).size.height / 2,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.lightGreen[200],
@@ -73,13 +83,12 @@ class _HomepageState extends State<Homepage> {
                   color: Colors.black.withOpacity(0.2),
                   spreadRadius: 4,
                   blurRadius: 10,
-                  offset: const Offset(0, 10), // Shadow direction
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
             child: Stack(
               children: [
-                // Text in the left corner
                 const Positioned(
                   top: 35,
                   left: 20,
@@ -96,7 +105,6 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ),
                 ),
-                // Scan button below the text
                 Positioned(
                   top: 350,
                   left: 40,
@@ -115,13 +123,12 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ),
                 ),
-                // Image in the right corner
                 Positioned(
                   bottom: -110,
                   right: 20,
                   child: Image.asset(
                     'assets/image/3.png', // Replace with your image path
-                    height: 500, // Adjust image size
+                    height: 500,
                     width: 105,
                   ),
                 ),
@@ -153,8 +160,6 @@ class _HomepageState extends State<Homepage> {
               ),
             ),
           ),
-
-          // Bottom Navigation Bar
           CustomBottomNavBar(
             currentIndex: 0, // Profile Tab Index
             navigateToHomePage: () => navigateToHomePage(context),
