@@ -77,16 +77,16 @@ class _SignUpState extends State<SignUp> {
             ),
           );
 
-          //Navigator.of(context).pushReplacement(
-          //  MaterialPageRoute(
-          //    builder: (context) => Homepage(userId: user.uid),
-          //  ),
-          //);
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => IntroScreenOne(userId: user.uid),
-            ),
+           MaterialPageRoute(
+             builder: (context) => Homepage(userId: user.uid),
+           ),
           );
+          // Navigator.of(context).pushReplacement(
+          //   MaterialPageRoute(
+          //     builder: (context) => IntroScreenOne(userId: user.uid),
+          //   ),
+          // );
         }
       } catch (e) {
         Fluttertoast.showToast(
