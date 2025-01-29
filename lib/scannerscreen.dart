@@ -1,72 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-class BarcodeAnalysisScreen extends StatefulWidget {
-  final String barcode;
-  const BarcodeAnalysisScreen({super.key, required this.barcode});
+class BarcodeAnalysisScreen extends StatelessWidget {
+  final Product product;
 
-  @override
-  _BarcodeAnalysisScreenState createState() => _BarcodeAnalysisScreenState();
-}
-
-class _BarcodeAnalysisScreenState extends State<BarcodeAnalysisScreen> {
-  Map<String, dynamic>? productInfo;
-  bool isLoading = true;
-  String errorMessage = "";
-
-  @override
-  void initState() {
-    super.initState();
-    fetchProductDetails();
-  }
-
-  Future<void> fetchProductDetails() async {
-    try {
-      final response = await http.get(Uri.parse('http://your-server-ip:port/barcode/${widget.barcode}'));
-      if (response.statusCode == 200) {
-        setState(() {
-          productInfo = json.decode(response.body);
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          errorMessage = "Failed to fetch product data.";
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        errorMessage = "Error occurred: $e";
-        isLoading = false;
-      });
-    }
-  }
+  const BarcodeAnalysisScreen({Key? key, required this.product}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Product Analysis")),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : productInfo != null
-              ? Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Product: ${productInfo!['product_name']}",
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 20),
-                      Text("NutriScore: ${productInfo!['nutriscore']}"),
-                      Text("EcoScore: ${productInfo!['ecoscore']}"),
-                      // Display other product info here
-                    ],
-                  ),
-                )
-              : Center(child: Text(errorMessage)),
+      appBar: AppBar(
+        title: Text('Product Analysis'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Product: ${product.name}', style: TextStyle(fontSize: 20)),
+            Text('Nutri-Score: ${product.nutriscore}', style: TextStyle(fontSize: 16)),
+            Text('Eco-Score: ${product.ecoscore}', style: TextStyle(fontSize: 16)),
+            Text('Ingredients: ${product.ingredientsText}', style: TextStyle(fontSize: 14)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Product {
+  final String name;
+  final String barcode;
+  final String nutriscore;
+  final String ecoscore;
+  final String ingredientsText;
+
+  Product({
+    required this.name,
+    required this.barcode,
+    required this.nutriscore,
+    required this.ecoscore,
+    required this.ingredientsText,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      name: json['name'],
+      barcode: json['barcode'],
+      nutriscore: json['nutriscore'],
+      ecoscore: json['ecoscore'],
+      ingredientsText: json['ingredients_text'],
     );
   }
 }

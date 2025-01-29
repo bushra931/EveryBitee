@@ -1,26 +1,40 @@
-from flask import Flask, jsonify
+from fastapi import FastAPI
 from datasets import load_dataset
+from pydantic import BaseModel
 
-app = Flask(__name__)
+# Load OpenFoodFacts dataset
+dataset = load_dataset("openfoodfacts/product-database", split="train")
 
-# Load the OpenFoodFacts dataset (this can be optimized)
-dataset = load_dataset("openfoodfacts/product-database")
+# Create a FastAPI app
+app = FastAPI()
 
-@app.route('/barcode/<string:barcode>', methods=['GET'])
-def get_product_info(barcode):
-    # Search for the product in the dataset by barcode
-    product_data = dataset['train'].filter(lambda x: x['barcode'] == barcode)
+class BarcodeRequest(BaseModel):
+    barcode: str
 
-    if len(product_data) > 0:
-        product = product_data[0]
-        return jsonify({
-            'product_name': product.get('product_name', 'N/A'),
-            'nutriscore': product.get('nutriscore_grade', 'N/A'),
-            'ecoscore': product.get('ecoscore_score', 'N/A'),
-            # Add more fields if required
-        })
+class Product(BaseModel):
+    name: str
+    barcode: str
+    nutriscore: str
+    ecoscore: str
+    ingredients_text: str
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the OpenFoodFacts API"}
+
+@app.post("/get_product/")
+def get_product_by_barcode(request: BarcodeRequest):
+    barcode = request.barcode
+    # Search the dataset for the given barcode
+    product = next((p for p in dataset if p['code'] == barcode), None)
+
+    if product:
+        return Product(
+            name=product['product_name'],
+            barcode=product['code'],
+            nutriscore=product.get('nutriscore_grade', 'N/A'),
+            ecoscore=product.get('ecoscore_grade', 'N/A'),
+            ingredients_text=product.get('ingredients_text', 'N/A')
+        )
     else:
-        return jsonify({'error': 'Product not found'}), 404
-
-if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=5000)
+        return {"error": "Product not found"}
