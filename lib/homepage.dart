@@ -1,3 +1,5 @@
+import 'package:everybite/bottomnav.dart';
+import 'package:everybite/profilepage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,6 +12,20 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  void navigateToHomePage(BuildContext context) {
+    // Navigator.pushReplacement(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => Homepage()),
+    // );
+  }
+
+  void navigateToProfilePage(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ProfilePage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,25 +131,10 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
           // Bottom Navigation Bar
-          BottomNavigationBar(
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.eco),
-                label: 'Explore',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
-            selectedItemColor: Colors.green,
-            unselectedItemColor: Colors.grey,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
+          CustomBottomNavBar(
+            currentIndex: 0, // Profile Tab Index
+            navigateToHomePage: () => navigateToHomePage(context),
+            navigateToProfilePage: () => navigateToProfilePage(context),
           ),
         ],
       ),
