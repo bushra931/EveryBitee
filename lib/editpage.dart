@@ -5,235 +5,122 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+class EditProfile extends StatefulWidget {
+  final String userId;
+  const EditProfile({super.key, required this.userId});
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<EditProfile> createState() => _EditProfileState();
 }
 
-class _SignUpState extends State<SignUp> {
+class _EditProfileState extends State<EditProfile> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _allergiesController = TextEditingController();
+  final TextEditingController _pregnancyStatusController =
+      TextEditingController(); // New Controller
 
   bool _passwordVisible = false;
-  bool _confirmPasswordVisible = false;
-  bool _isLoading = false;
   String? _selectedGender;
   String? _selectedDietaryPreference;
-  String? _pregnancyStatus;
+
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(widget.userId).get();
+      if (userDoc.exists) {
+        var userData = userDoc.data() as Map<String, dynamic>;
+        _nameController.text = userData['full_name'] ?? '';
+        _emailController.text = userData['email'] ?? '';
+        _selectedGender = userData['gender'];
+        _ageController.text = userData['age'] ?? '';
+        _selectedDietaryPreference = userData['dietary_preference'];
+        _allergiesController.text = userData['allergies'] ?? '';
+        _pregnancyStatusController.text =
+            userData['pregnancy_status'] ?? ''; // Fetch pregnancy status
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Error loading user data: ${e.toString()}",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+      );
+    }
+  }
+
+  Future<void> _updateProfile() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isLoading = true; // Start showing loader
+      });
+
+      // Simulate a brief wait to keep the loader visible for a short time
+      Future.delayed(const Duration(milliseconds: 300), () async {
+        try {
+          await _firestore.collection('users').doc(widget.userId).update({
+            'full_name': _nameController.text.trim(),
+            'gender': _selectedGender,
+            'age': _ageController.text.trim(),
+            'dietary_preference': _selectedDietaryPreference,
+            'allergies': _allergiesController.text.trim(),
+            'pregnancy_status': _pregnancyStatusController.text.trim(),
+          });
+
+          // Once the update is complete, show a toast and navigate
+          Fluttertoast.showToast(
+            msg: "Profile updated successfully.",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+          );
+
+          // Immediately hide the loader and navigate
+          setState(() {
+            _isLoading = false;
+          });
+
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+                builder: (context) => Homepage(userId: widget.userId)),
+          );
+        } catch (e) {
+          // Hide loader and show error if update fails
+          setState(() {
+            _isLoading = false;
+          });
+
+          Fluttertoast.showToast(
+            msg: "Error updating profile: ${e.toString()}",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     _nameController.dispose();
     _ageController.dispose();
     _allergiesController.dispose();
+    _pregnancyStatusController.dispose(); // Dispose the controller
     super.dispose();
-  }
-
-  Future<void> _signUpWithEmail() async {
-    // Validation logic...
-
-    try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-
-      User? user = userCredential.user;
-      if (user != null) {
-        await user.sendEmailVerification();
-        Fluttertoast.showToast(
-          msg: "Verification email sent. Please check your inbox.",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-        );
-
-        await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Verify Your Email"),
-            content: Text(
-                "A verification link has been sent to ${user.email}. Please verify your email to complete the sign-up process."),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text("OK"),
-              ),
-            ],
-          ),
-        );
-
-        _checkEmailVerificationStatus(); // Start polling for verification
-      }
-    } catch (e) {
-      print("Error signing up: $e");
-      Fluttertoast.showToast(
-        msg: "Sign up failed: $e",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
-  }
-
-  Future<void> _checkEmailVerificationStatus() async {
-    User? user = _auth.currentUser;
-
-    if (user != null) {
-      bool emailVerified = false;
-
-      while (!emailVerified) {
-        await Future.delayed(const Duration(seconds: 3)); // Wait 3 seconds
-        await user?.reload(); // Refresh user information
-        user = _auth.currentUser; // Get updated user instance
-        emailVerified = user!.emailVerified;
-
-        if (emailVerified) {
-          Fluttertoast.showToast(
-            msg: "Email verified successfully!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-          );
-
-          // Add user details to Firestore
-          await _firestore.collection('users').doc(user.uid).set({
-            'full_name': _nameController.text.trim(),
-            'email': user.email,
-            'profilepic': '',
-            'gender': _selectedGender,
-            'pregnancy_status': _pregnancyStatus,
-            'age': _ageController.text.trim(),
-            'dietary_preference': _selectedDietaryPreference,
-            'allergies': _allergiesController.text.trim(),
-          });
-
-          // Navigate to Userprofile
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => Homepage(userId: user!.uid),
-            ),
-          );
-          break;
-        }
-      }
-    }
-  }
-
-  // Future<void> _signUpWithEmail() async {
-  //   if (_formKey.currentState?.validate() ?? false) {
-  //     setState(() => _isLoading = true);
-  //     try {
-  //       UserCredential userCredential =
-  //           await _auth.createUserWithEmailAndPassword(
-  //         email: _emailController.text.trim(),
-  //         password: _passwordController.text.trim(),
-  //       );
-
-  //       User? user = userCredential.user;
-  //       if (user != null) {
-  //         await user.sendEmailVerification();
-  //         Fluttertoast.showToast(
-  //           msg: "Verification email sent. Please check your inbox.",
-  //           toastLength: Toast.LENGTH_LONG,
-  //           gravity: ToastGravity.BOTTOM,
-  //         );
-
-  //         await _firestore.collection('users').doc(user.uid).set({
-  //           'full_name': _nameController.text.trim(),
-  //           'email': user.email,
-  //           'profilepic': '',
-  //           'gender': _selectedGender,
-  //           'pregnancy_status': _pregnancyStatus,
-  //           'age': _ageController.text.trim(),
-  //           'dietary_preference': _selectedDietaryPreference,
-  //           'allergies': _allergiesController.text.trim(),
-  //         });
-
-  //         showDialog(
-  //           context: context,
-  //           builder: (context) => AlertDialog(
-  //             title: const Text("Verify Your Email"),
-  //             content: Text(
-  //                 "A verification link has been sent to ${user.email}. Please verify your email to complete the sign-up process."),
-  //             actions: [
-  //               TextButton(
-  //                 onPressed: () => Navigator.of(context).pop(),
-  //                 child: const Text("OK"),
-  //               ),
-  //             ],
-  //           ),
-  //         );
-  //         setState(() {
-  //           _isLoading = false;
-  //         });
-
-  //         Navigator.of(context).pushReplacement(
-  //           MaterialPageRoute(
-  //             builder: (context) => Homepage(userId: user.uid),
-  //           ),
-  //         );
-  //       }
-  //     } catch (e) {
-  //       Fluttertoast.showToast(
-  //         msg: "Sign up failed: ${e.toString()}",
-  //         toastLength: Toast.LENGTH_LONG,
-  //         gravity: ToastGravity.CENTER,
-  //         backgroundColor: Colors.red,
-  //         textColor: Colors.white,
-  //       );
-  //     } finally {
-  //       setState(() => _isLoading = false);
-  //     }
-  //   }
-  // }
-
-  void _askPregnancyStatus() {
-    if (_selectedGender == 'Female') {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Pregnancy Status"),
-          content: const Text("Are you pregnant?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _pregnancyStatus = 'No';
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text("No"),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _pregnancyStatus = 'Yes';
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text("Yes"),
-            ),
-          ],
-        ),
-      );
-    }
   }
 
   @override
@@ -249,7 +136,8 @@ class _SignUpState extends State<SignUp> {
           ),
           Positioned.fill(
             child: Container(
-                color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.6)),
+              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.6),
+            ),
           ),
           Center(
             child: SingleChildScrollView(
@@ -261,7 +149,7 @@ class _SignUpState extends State<SignUp> {
                     Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Text(
-                        "Create a new account",
+                        "Edit Profile",
                         style: GoogleFonts.ebGaramond(
                           color: const Color.fromARGB(255, 182, 225, 192),
                           fontSize: 25,
@@ -312,6 +200,7 @@ class _SignUpState extends State<SignUp> {
                               ),
                               labelStyle: TextStyle(color: Colors.white),
                             ),
+                            value: _selectedGender,
                             items: const [
                               DropdownMenuItem(
                                 value: 'Male',
@@ -330,7 +219,6 @@ class _SignUpState extends State<SignUp> {
                               setState(() {
                                 _selectedGender = value;
                               });
-                              _askPregnancyStatus(); // Check pregnancy status if female
                             },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -381,6 +269,7 @@ class _SignUpState extends State<SignUp> {
                               ),
                               labelStyle: TextStyle(color: Colors.white),
                             ),
+                            value: _selectedDietaryPreference,
                             items: const [
                               DropdownMenuItem(
                                 value: 'Vegetarian',
@@ -421,13 +310,33 @@ class _SignUpState extends State<SignUp> {
                                   right: Radius.circular(18),
                                 ),
                               ),
-                              labelStyle: TextStyle(color: Colors.white),
+                              labelStyle: TextStyle(
+                                  color: Color.fromARGB(255, 251, 249, 249)),
                             ),
                           ),
                           const SizedBox(height: 17),
                           TextFormField(
+                            controller:
+                                _pregnancyStatusController, // New field for pregnancy status
+                            style: const TextStyle(color: Colors.white),
+                            decoration: const InputDecoration(
+                              labelText: 'Pregnancy Status',
+                              prefixIcon: Icon(Icons.pregnant_woman),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                                borderRadius: BorderRadius.horizontal(
+                                  left: Radius.circular(18),
+                                  right: Radius.circular(18),
+                                ),
+                              ),
+                              labelStyle: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+                          TextFormField(
                             controller: _emailController,
                             style: const TextStyle(color: Colors.white),
+                            keyboardType: TextInputType.emailAddress,
                             decoration: const InputDecoration(
                               labelText: 'Email',
                               prefixIcon: Icon(Icons.email),
@@ -443,92 +352,24 @@ class _SignUpState extends State<SignUp> {
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your email';
-                              } else if (!RegExp(
-                                      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-                                  .hasMatch(value)) {
-                                return 'Please enter a valid email address';
                               }
                               return null;
                             },
                           ),
-                          const SizedBox(height: 17),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: !_passwordVisible,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              prefixIcon: const Icon(Icons.lock),
-                              suffixIcon: IconButton(
-                                icon: Icon(_passwordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off),
-                                onPressed: () {
-                                  setState(() {
-                                    _passwordVisible = !_passwordVisible;
-                                  });
-                                },
-                              ),
-                              enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                                borderRadius: BorderRadius.horizontal(
-                                  left: Radius.circular(18),
-                                  right: Radius.circular(18),
-                                ),
-                              ),
-                              labelStyle: const TextStyle(color: Colors.white),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter a password';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 17),
-                          TextFormField(
-                            controller: _confirmPasswordController,
-                            obscureText: !_confirmPasswordVisible,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: 'Confirm Password',
-                              prefixIcon: const Icon(Icons.lock),
-                              suffixIcon: IconButton(
-                                icon: Icon(_confirmPasswordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off),
-                                onPressed: () {
-                                  setState(() {
-                                    _confirmPasswordVisible =
-                                        !_confirmPasswordVisible;
-                                  });
-                                },
-                              ),
-                              enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                                borderRadius: BorderRadius.horizontal(
-                                  left: Radius.circular(18),
-                                  right: Radius.circular(18),
-                                ),
-                              ),
-                              labelStyle: const TextStyle(color: Colors.white),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please confirm your password';
-                              } else if (value != _passwordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 30),
                           ElevatedButton(
-                            onPressed: _isLoading ? null : _signUpWithEmail,
-                            child: _isLoading
-                                ? const CircularProgressIndicator()
-                                : const Text('Sign Up'),
+                            onPressed: _updateProfile,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 25),
+                            ),
+                            child: const Text('Update Profile'),
                           ),
+                          const SizedBox(height: 15),
                         ],
                       ),
                     ),
