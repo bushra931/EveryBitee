@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1029869106896",
+    "project_id": "everybite-ba3f2",
+    "storage_bucket": "everybite-ba3f2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1029869106896:android:a2cf1c7f0e2afc29ea90d5",
+        "android_client_info": {
+          "package_name": "com.example.everybite"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQFZ4mEKCOB1Ed1PFC_PPueS3rcT1fFgw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
