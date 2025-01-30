@@ -125,9 +125,12 @@ class _SignUpState extends State<SignUp> {
           });
 
           // Navigate to Userprofile
-        
-=======
-          
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => Homepage(userId: user!.uid),
+            ),
+          );
+          break;
         }
       }
     }
