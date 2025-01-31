@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) 
+  Widget build(BuildContext context) {
+    // <-- Corrected: Added missing `{`
     return MaterialApp(
       title: 'EveryBite',
       debugShowCheckedModeBanner: false,
@@ -31,5 +32,5 @@ class MyApp extends StatelessWidget {
       // ),
       home: const SplashScreen(),
     );
-  }
+  } // <-- Corrected: Added missing `}`
 }
