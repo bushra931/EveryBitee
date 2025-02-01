@@ -2,6 +2,8 @@ import 'package:everybite/ai/ai_controller.dart';
 import 'package:everybite/ai/apiBarcode.dart';
 import 'package:everybite/ai/report.dart';
 import 'package:everybite/common/widgets.dart';
+import 'package:everybite/bottomnav.dart';
+import 'package:everybite/profilepage.dart';
 
 import 'package:everybite/scanningpage.dart';
 import 'package:flutter/material.dart';
@@ -38,13 +40,20 @@ class _HomepageState extends State<Homepage> {
     super.dispose();
   }
 
+  void navigateToProfilePage(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ProfilePage()),
+    );
+  }
+
   int _numInterstitialLoadAttempts = 0;
   int maxFailedLoadAttempts = 3;
   bool isLoaded = false;
 
   String finalPrompt = '';
   final storage = GetStorage();
-
+  
   void _showSplashAndNavigate() {
     // Show splash screen for 1 second
     Future.delayed(Duration(seconds: 1), () {
@@ -249,7 +258,7 @@ If some information is not provided, don't write that the information is not pro
             child: Stack(
               children: [
                 const Positioned(
-                  top: 35,
+                  top: 80,
                   left: 20,
                   child: SizedBox(
                     width: 200,
@@ -257,7 +266,7 @@ If some information is not provided, don't write that the information is not pro
                       "Unlock the power of nutrition with just a scan. Discover the real value of every product, right at your fingertips!",
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 20,
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
                       ),
@@ -266,22 +275,13 @@ If some information is not provided, don't write that the information is not pro
                 ),
                 Container(
                   decoration: BoxDecoration(
-                      color: Color(0xFF9E9BC7),
+                      color: Colors.lightGreen[200],
                       borderRadius: BorderRadius.circular(32)),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width / 3,
+                        vertical: 10),
                     child: Row(children: [
-                      SizedBox(
-                        width: 138,
-                        child: Text(
-                          "Scan Barcodes directly here",
-                          style: GoogleFonts.signika(
-                              fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
                       ZoomTapAnimation(
                         onTap: () async {
                           String barcodeScanRes =
@@ -325,18 +325,17 @@ If some information is not provided, don't write that the information is not pro
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Padding(
-                            padding: EdgeInsets.all(8),
+                            padding: EdgeInsets.all(10),
                             child: Row(children: [
                               Image.asset("assets/image/qr_icon.png"),
                               SizedBox(
-                                width: 8,
+                                width:13,
                               ),
                               Text(
                                 "Scan Now",
                                 style: GoogleFonts.signika(
-                                  fontWeight: FontWeight.bold,
                                   fontSize: 12,
-                                  color: Color(0xFF9E9BC7),
+                                  color: const Color.fromARGB(255, 48, 85, 6),
                                 ),
                               )
                             ]),
@@ -348,9 +347,9 @@ If some information is not provided, don't write that the information is not pro
                 ),
                 Positioned(
                   bottom: -110,
-                  right: 20,
+                  right: 50,
                   child: Image.asset(
-                    'assets/image/3.png', // Replace with your image path
+                    'assets/image/wrap.png', // Replace with your image path
                     height: 500,
                     width: 105,
                   ),
@@ -358,7 +357,6 @@ If some information is not provided, don't write that the information is not pro
               ],
             ),
           ),
-
           // Display Scanned Barcode
           Expanded(
             child: Center(
@@ -366,7 +364,7 @@ If some information is not provided, don't write that the information is not pro
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset(
-                    'assets/image/2.png', // Replace with your image path
+                    'assets/image/corn.png', // Replace with your image path
                     width: 150,
                     height: 150,
                   ),
@@ -384,6 +382,11 @@ If some information is not provided, don't write that the information is not pro
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 0, // Set index as 0 or any other depending on your needs
+        navigateToHomePage: () {}, // You can modify the Home page navigation logic here
+        navigateToProfilePage: () => navigateToProfilePage(context),
       ),
     );
   }
