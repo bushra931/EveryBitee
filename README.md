@@ -1,6 +1,6 @@
 # EveryBite
 
-#Empowering Health Through Informed Nutrition.
+"Empowering Health Through Informed Nutrition."
 
 
 
