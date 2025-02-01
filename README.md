@@ -1,16 +1,7 @@
-# everybite
+# EveryBite
 
-A new Flutter project.
+##Empowering Health Through Informed Nutrition.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+EveryBite makes food labels easy to understand for people, eliminating challenges like poor nutrition, diabetes, and health risks during pregnancy. With AI insights tailored to your health needs, EveryBite empowers smarter food choices, reduces hospital visits, and promotes a healthier lifestyle. Watch how EveryBite is changing everything in nutrition for everyone!
