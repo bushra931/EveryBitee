@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:everybite/TandC.dart';
 import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
@@ -111,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: Center(
           child: Column(
@@ -144,7 +145,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           EditProfile(userId: user!.uid), // Pass userId
                     ));
               }),
-              _buildProfileButton("Terms and Policy", Icons.description, () {}),
+              _buildProfileButton("Terms and Policy", Icons.description, () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          TermsAndConditionsPage(), // Pass userId
+                    ));
+              }),
               _buildProfileButton("Sign Out", Icons.logout, _signOut),
             ],
           ),
