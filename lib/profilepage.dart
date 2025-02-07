@@ -1,3 +1,4 @@
+import 'package:everybite/TandC.dart';
 import 'package:everybite/bottomnav.dart';
 import 'package:everybite/editpage.dart';
 import 'package:everybite/homepage.dart';
@@ -111,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: Center(
           child: Column(
@@ -144,7 +145,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           EditProfile(userId: user!.uid), // Pass userId
                     ));
               }),
-              _buildProfileButton("Terms and Policy", Icons.description, () {}),
+              _buildProfileButton("Terms and Policy", Icons.description, () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          TermsAndConditionsPage(), // Pass userId
+                    ));
+              }),
               _buildProfileButton("Sign Out", Icons.logout, _signOut),
             ],
           ),

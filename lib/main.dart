@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:everybite/homepage.dart';
 import 'package:everybite/loginpage.dart';
 import 'package:everybite/StartSplashScreen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding
