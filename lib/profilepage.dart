@@ -1,5 +1,6 @@
 import 'package:everybite/TandC.dart';
 import 'package:everybite/bottomnav.dart';
+import 'package:everybite/chatscreen.dart';
 import 'package:everybite/editpage.dart';
 import 'package:everybite/homepage.dart';
 import 'package:everybite/loginpage.dart';
@@ -81,7 +82,12 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     }
   }
-
+void navigateToChatScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChatScreen()), // ChatScreen is your chat screen
+    );
+  }
   void navigateToHomePage(BuildContext context) {
     Navigator.pushReplacement(
       context,
@@ -161,7 +167,7 @@ class _ProfilePageState extends State<ProfilePage> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 2, // Profile Tab Index
         navigateToHomePage: () => navigateToHomePage(context),
-        navigateToProfilePage: () => navigateToProfilePage(context),
+        navigateToProfilePage: () => navigateToProfilePage(context),  navigateToScanPage: () => navigateToChatScreen(context),
       ),
     );
   }
