@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:everybite/analysispage1.dart';
 import 'package:flutter/material.dart';
-import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:barcode_scan2/barcode_scan2.dart' as barcodescan;
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:everybite/analysispage.dart';
 import 'package:everybite/profilepage.dart';
 import 'package:everybite/bottomnav.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Homepage extends StatefulWidget {
   final String userId;
@@ -43,9 +46,102 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  Future<void> scanIngredients() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final textRecognizer = GoogleMlKit.vision.textRecognizer();
+      final inputImage = InputImage.fromFilePath(pickedFile.path);
+      final RecognizedText recognizedText =
+          await textRecognizer.processImage(inputImage);
+
+      String ingredientsText = recognizedText.text;
+
+      await analyzeIngredients(ingredientsText);
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> analyzeIngredients(String ingredientsText) async {
+    const apiKey = "AIzaSyBFfJrN7Bq6ilr7ep_NTtFSI6s_cJMvBWg";
+
+    final model = GenerativeModel(apiKey: apiKey, model: "gemini-pro");
+
+    String userDetails = "";
+    if (userData != null) {
+      userDetails = """
+User Details:
+- Name: ${userData!['full_name']}
+- Age: ${userData!['age']}
+- Gender: ${userData!['gender']}
+- Dietary Preference: ${userData!['dietary_preference']}
+- Allergies: ${userData!['allergies']}
+- Pregnancy Status: ${userData!['pregnancy_status']}
+""";
+    }
+
+    final prompt = """
+$userDetails
+
+Analyze the following food ingredients:
+$ingredientsText
+
+give a separate paragraph for telling the user if the product is fit for consumption for the user
+If the product contains sodium and iron,  compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
+Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
+
+Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
+Also, give a personalized response based on the allergies and medical conditions inputted above. 
+Adding to it, if there is a con in the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+
+Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and 
+Please use markdown to format the response.
+
+At last give me a conclusion in which discuss whether the product is fit for consumption . Give a direct answer in yes or a no. and give reasoning for the answer you wish to output. Considor all the parameters and the harms and benfits of each ingredient listed and then draw out a reliable result
+Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and nutriscore, describe what does the score stand for. 
+Also, use the carbon footprint to give a conclusion if the product is environmentally friendly or not. 
+Also, use the packaging material to draw out the results.
+Please use markdown to format the response.
+
+Generate the response in plain text without using any bold, bullets, or special symbols.
+do not use special formats for heading
+while generating the reposnse dont print the user details specifically in the beginning
+""";
+
+    try {
+      final response = await model.generateContent([Content.text(prompt)]);
+
+      if (response.text != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AnalysisPage1(
+              productData: {"ingredients_text": ingredientsText},
+              analysisResult: response.text!,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error generating AI analysis: $e");
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   Future<void> scanBarcode() async {
     try {
-      var result = await BarcodeScanner.scan();
+      var result = await barcodescan.BarcodeScanner.scan();
       setState(() {
         scannedBarcode = result.rawContent;
       });
@@ -83,8 +179,8 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<void> analyzeFood(Map<String, dynamic> product) async {
-    // const apiKey = "AIzaSyBFfJrN7Bq6ilr7ep_NTtFSI6s_cJMvBWg";
-    const apiKey = "";
+    const apiKey = "AIzaSyBFfJrN7Bq6ilr7ep_NTtFSI6s_cJMvBWg";
+
     final model = GenerativeModel(apiKey: apiKey, model: "gemini-pro");
 
     String userDetails = "";
@@ -236,13 +332,13 @@ Please use markdown to format the response.
                       bottom: -60,
                       right: 50,
                       child: Image.asset(
-                        'assets/image/wrap.png', // Replace with your image path
+                        'assets/image/wrap.png',
                         height: 500,
                         width: 105,
                       ),
                     ),
                     Positioned(
-                      top: 330,
+                      top: 350,
                       left: 20,
                       child: ElevatedButton.icon(
                         onPressed: scanBarcode,
@@ -263,22 +359,73 @@ Please use markdown to format the response.
                 ),
               ),
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                child: Padding(
+                  padding: const EdgeInsets.all(40),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Image.asset(
-                        'assets/image/corn.png', // Replace with your image path
+                        'assets/image/corn.png',
                         width: 150,
                         height: 150,
                       ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Scan, Discover, Nourish!",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Scan, Discover, Nourish!",
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(221, 70, 3, 112),
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            const Text(
+                              "Get your NutriScore by scanning the Ingredients now!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              width:
+                                  250, // Adjust the width of the button as needed
+                              child: ElevatedButton.icon(
+                                onPressed: scanIngredients,
+                                icon: SizedBox(
+                                  width:
+                                      30, // Adjust the width of the icon if needed
+                                  child: Icon(
+                                    Icons.qr_code_scanner,
+                                    color: Color.fromARGB(255, 151, 86, 1),
+                                    size: 24, // Adjust the size of the icon
+                                  ),
+                                ),
+                                label: const Text(
+                                  "Scan Ingredients",
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor:
+                                      const Color.fromARGB(255, 151, 86, 1),
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 255, 224, 195),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -292,8 +439,8 @@ Please use markdown to format the response.
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(), // Loading spinner
-                  SizedBox(height: 20), // Spacing between spinner and text
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
                   Text(
                     'Generating your personalized response...',
                     textAlign: TextAlign.center,
@@ -309,9 +456,8 @@ Please use markdown to format the response.
         ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 0, // Set index as 0 or any other depending on your needs
-        navigateToHomePage:
-            () {}, // You can modify the Home page navigation logic here
+        currentIndex: 0,
+        navigateToHomePage: () {},
         navigateToProfilePage: () => navigateToProfilePage(context),
       ),
     );
