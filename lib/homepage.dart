@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:everybite/bottomnav.dart';
+import 'package:everybite/analysispage1.dart';
+import 'package:everybite/chatscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart' as barcodescan;
 import 'package:google_ml_kit/google_ml_kit.dart';
@@ -275,12 +278,15 @@ Please use markdown to format the response.
       _isLoading = false;
     });
   }
-void navigateToChatScreen(BuildContext context) {
+
+  void navigateToChatScreen(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ChatScreen()), // ChatScreen is your chat screen
+      MaterialPageRoute(
+          builder: (context) => ChatScreen()), // ChatScreen is your chat screen
     );
   }
+
   void navigateToProfilePage(BuildContext context) {
     Navigator.pushReplacement(
       context,
@@ -415,7 +421,6 @@ void navigateToChatScreen(BuildContext context) {
                                   "Scan Ingredients",
                                   style: TextStyle(fontSize: 15),
                                 ),
-                                
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor:
                                       const Color.fromARGB(255, 151, 86, 1),
@@ -460,10 +465,11 @@ void navigateToChatScreen(BuildContext context) {
         ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 0, // Set index as 0 or any other depending on your needs
+        currentIndex: 0, // Set index as needed
         navigateToHomePage:
-            () {}, // You can modify the Home page navigation logic here
-        navigateToProfilePage: () => navigateToProfilePage(context),
+            () {}, // Modify as per your existing navigation logic
+        navigateToProfilePage: () {},
+        navigateToScanPage: () => navigateToChatScreen(context),
       ),
     );
   }
