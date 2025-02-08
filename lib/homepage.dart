@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:everybite/analysispage1.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart' as barcodescan;
 import 'package:google_ml_kit/google_ml_kit.dart';
@@ -276,7 +275,12 @@ Please use markdown to format the response.
       _isLoading = false;
     });
   }
-
+void navigateToChatScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChatScreen()), // ChatScreen is your chat screen
+    );
+  }
   void navigateToProfilePage(BuildContext context) {
     Navigator.pushReplacement(
       context,
@@ -456,8 +460,9 @@ Please use markdown to format the response.
         ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 0,
-        navigateToHomePage: () {},
+        currentIndex: 0, // Set index as 0 or any other depending on your needs
+        navigateToHomePage:
+            () {}, // You can modify the Home page navigation logic here
         navigateToProfilePage: () => navigateToProfilePage(context),
       ),
     );
