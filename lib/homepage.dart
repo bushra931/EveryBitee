@@ -95,14 +95,15 @@ $userDetails
 
 Analyze the following food ingredients:
 $ingredientsText
-
+give me a personalised feedback of the product with user details a conclusion in which discuss whether the product is fit for consumption . Give a direct answer in yes or a no. and give reasoning for the answer you wish to output. Considor all the parameters and the harms and benfits of each ingredient listed and then draw out a reliable result
 give a separate paragraph for telling the user if the product is fit for consumption for the user
-If the product contains sodium and iron,  compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
-Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
-
 Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
 Also, give a personalized response based on the allergies and medical conditions inputted above. 
 Adding to it, if there is a con in the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+
+If the product contains sodium and iron,  compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
+Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
+
 
 Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and 
 Please use markdown to format the response.
@@ -215,6 +216,12 @@ Sodium: ${product["nutriments"]?["sodium"] ?? "Not available"}
 Iron: ${product["nutriments"]?["iron"] ?? "Not available"}
 
 Is the Product Fit for Consumption?
+Personalized Response Based on Allergies or Medical Conditions:
+If the product contains allergens or medically relevant ingredients, provide advice, such as gluten or excessive sodium intake risks.
+rite the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
+Also, give a personalized response based on the allergies and medical conditions inputted above. 
+Adding to it, if there is a con Fin the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+
 Based on the nutritional values of the product, here is an assessment of its suitability for consumption:
 
 Sodium and Iron Analysis:
@@ -225,12 +232,6 @@ Pros and Cons:
 Pros: Provide health benefits based on the ingredients like high protein or antioxidants.
 Cons: Mention potential risks like allergens or high sugar content.
 
-Personalized Response Based on Allergies or Medical Conditions:
-If the product contains allergens or medically relevant ingredients, provide advice, such as gluten or excessive sodium intake risks.
-
-Environmental Aspect:
-Eco-Score: Evaluate the environmental impact based on production, transportation, and packaging.
-Nutri-Score: Generate an estimation from A to F based on key nutritional aspects.
 
 Carbon Footprint and Packaging:
 Discuss the carbon footprint and packaging sustainability.
@@ -246,9 +247,6 @@ Then, give a separate paragraph for telling the user if the product is fit for c
 Use the values of sodium and iron from the above information and compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
 Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
 
-Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
-Also, give a personalized response based on the allergies and medical conditions inputted above. 
-Adding to it, if there is a con Fin the product and if any ingredient is not adequate, give the possible health hazard related to it. 
 
 Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and nutriscore, describe what does the score stand for. 
 Also, use the carbon footprint to give a conclusion if the product is environmentally friendly or not. 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -21,121 +20,127 @@ class ChatScreen extends StatefulWidget {
   _ChatScreenState createState() => _ChatScreenState();
 }
 
-List<Map<String, dynamic>> parseIngredients(String response) {
-  List<Map<String, dynamic>> ingredients = [];
-  List<String> lines = response.split("\n");
-
-  for (String line in lines) {
-    if (line.startsWith("- ")) {
-      String ingredient = line.substring(2); // Remove "- " from the start
-      ingredients.add({"name": ingredient, "selected": false});
-    }
-  }
-  return ingredients;
-}
-
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<String> messages = ["What are you planning to cook?"];
   List<Map<String, dynamic>> ingredientList = [];
-  List<String> selectedIngredients = []; // ✅ Stores selected ingredients
-
+  List<String> selectedIngredients = [];
   bool _isLoading = false;
+  bool _showCheckboxes = false;
+  bool _showCalorieOptions = false;
 
   void sendMessage() {
-  if (_controller.text.isNotEmpty) {
-    String userMessage = _controller.text;
-    
-    setState(() {
-      messages.add(userMessage); // Add user's message to chat
-      _isLoading = true; // Show loading indicator
-    });
+    if (_controller.text.isNotEmpty) {
+      String userMessage = _controller.text;
+      setState(() {
+        messages.add(userMessage);
+        _isLoading = true;
+      });
+      _controller.clear();
 
-    _controller.clear(); // Clear text field
-
-    // ✅ If the user asks for nutritional values, use selected ingredients
-    if (userMessage.toLowerCase().contains("nutrition") && selectedIngredients.isNotEmpty) {
-      getNutritionalValue(selectedIngredients);
-    } else {
-      getDishIngredients(userMessage); // Call API to fetch ingredients
+      if (_showCalorieOptions) {
+        adjustCalories(userMessage);
+      } else if (userMessage.toLowerCase().contains("nutrition") &&
+          selectedIngredients.isNotEmpty) {
+        getNutritionalValue(selectedIngredients);
+      } else {
+        getDishIngredients(userMessage);
+      }
     }
   }
-}
 
-Future<void> getNutritionalValue(List<String> ingredients) async {
-  const apiKey = ""; // Add your Gemini API key here
-  final model = GenerativeModel(apiKey: apiKey, model: "gemini-pro");
-
-  final prompt = """
-I have the following ingredients:  
-${ingredients.join(", ")}  
-
-Please provide the detailed **nutritional values** for each ingredient, including:  
-- Calories  
-- Proteins  
-- Fats  
-- Carbohydrates  
-- Any additional health benefits  
-
-Make sure to format the response in a **clear and structured manner**.
+  Future<void> getNutritionalValue(List<String> ingredients) async {
+    const apiKey = "AIzaSyBFfJrN7Bq6ilr7ep_NTtFSI6s_cJMvBWg";
+    final model = GenerativeModel(apiKey: apiKey, model: "gemini-pro");
+    final prompt = """
+I have the following ingredients: ${ingredients.join(", ")}
+Provide the **total calorie count first in bold** and then give a detailed breakdown:
+- **Total Calories: XX kcal**
+- Ingredient-wise breakdown:
+  - Calories
+  - Proteins
+  - Fats
+  - Carbohydrates
+  - Additional health benefits
 """;
-print(prompt);
-  try {
-    final response = await model.generateContent([Content.text(prompt)]);
+    try {
+      final response = await model.generateContent([Content.text(prompt)]);
+      if (response.text != null) {
+        setState(() {
+          messages.add(response.text!);
+          _isLoading = false;
+          _showCheckboxes = false;
+          ingredientList.clear();
+          selectedIngredients.clear();
+          _showCalorieOptions = true;
 
-    if (response.text != null) {
+          messages.add(
+              "Do you want to **increase or decrease** calorie intake?\nChoose an option:");
+        });
+      }
+    } catch (e) {
       setState(() {
-        messages.add("Here is the nutritional breakdown:\n" + response.text!);
+        messages.add("Error fetching nutritional values. Please try again.");
         _isLoading = false;
       });
     }
-  } catch (e) {
-    setState(() {
-      messages.add("Error fetching nutritional values. Please try again.");
-      _isLoading = false;
-    });
-    print("Error fetching nutritional values: $e");
   }
-}
 
+  void adjustCalories(String userResponse) async {
+    bool increase = userResponse.toLowerCase().contains("increase");
+    bool decrease = userResponse.toLowerCase().contains("decrease");
 
-  Future<void> getDishIngredients(String dishName) async {
-    const apiKey =
-        ""; // Add your Gemini API key here
+    if (!increase && !decrease) {
+      messages.add("Please choose a valid option: 'Increase' or 'Decrease'.");
+      return;
+    }
+
+    const apiKey = "AIzaSyBFfJrN7Bq6ilr7ep_NTtFSI6s_cJMvBWg";
     final model = GenerativeModel(apiKey: apiKey, model: "gemini-pro");
 
     final prompt = """
-I want to cook a dish named "$dishName".  
-Please provide a detailed list of ingredients required to make it.  
-Mention their quantities and any important preparation details.  
-
-Format the response as follows:
-- Ingredient Name: Quantity (if applicable)  
-- Special instructions if needed  
-
-Example:
-- Chicken Breast: 200g, boneless and skinless
-- Garlic: 2 cloves, minced
-- Olive Oil: 2 tablespoons
-- Salt: To taste  
-
-Give me a complete and accurate ingredient list in a structured, easy-to-read format.
+I have the following ingredients: ${selectedIngredients.join(", ")}
+I want to ${increase ? "increase" : "decrease"} the total calorie intake.
+Suggest alternative ingredients or modifications while maintaining taste and balance.
 """;
 
     try {
       final response = await model.generateContent([Content.text(prompt)]);
-
       if (response.text != null) {
-        List<Map<String, dynamic>> extractedIngredients =
-            parseIngredients(response.text!);
+        setState(() {
+          messages.add(response.text!);
+          _showCalorieOptions = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        messages.add("Error adjusting calorie intake. Please try again.");
+      });
+    }
+  }
 
+  Future<void> getDishIngredients(String dishName) async {
+    const apiKey = "AIzaSyBFfJrN7Bq6ilr7ep_NTtFSI6s_cJMvBWg";
+    final model = GenerativeModel(apiKey: apiKey, model: "gemini-pro");
+    final prompt = """
+I want to cook a dish named "$dishName". Provide a structured list of ingredients:
+- Ingredient Name: Quantity
+- Special instructions if needed
+""";
+    try {
+      final response = await model.generateContent([Content.text(prompt)]);
+      if (response.text != null) {
+        List<Map<String, dynamic>> extractedIngredients = response.text!
+            .split("\n")
+            .where((line) => line.startsWith("- "))
+            .map((line) => {"name": line.substring(2), "selected": false})
+            .toList();
         setState(() {
           messages.add("Here is the list of ingredients:\n" +
-              extractedIngredients
-                  .map((e) => "- ${e['name']}")
-                  .join("\n")); // Format ingredients as a message
-          ingredientList = extractedIngredients; // Store for checkboxes
-          _isLoading = false; // Hide loading indicator
+              extractedIngredients.map((e) => "- ${e['name']}").join("\n"));
+          ingredientList = extractedIngredients;
+          _isLoading = false;
+          _showCheckboxes = true;
         });
       }
     } catch (e) {
@@ -143,8 +148,72 @@ Give me a complete and accurate ingredient list in a structured, easy-to-read fo
         messages.add("Error fetching ingredients. Please try again.");
         _isLoading = false;
       });
-      print("Error fetching ingredients: $e");
     }
+  }
+
+  void startNewChat() {
+    setState(() {
+      messages.clear();
+      messages.add("What are you planning to cook?");
+      ingredientList.clear();
+      selectedIngredients.clear();
+      _showCheckboxes = false;
+      _showCalorieOptions = false;
+    });
+  }
+
+  Widget _buildMessage(String message, bool isUser) {
+    final regex = RegExp(r'\*\*(.*?)\*\*');
+    List<TextSpan> textSpans = [];
+    int lastEnd = 0;
+
+    // Use regex to find all matches of **text**
+    regex.allMatches(message).forEach((match) {
+      // Add the text before the match
+      if (match.start > lastEnd) {
+        textSpans.add(TextSpan(
+          text: message.substring(lastEnd, match.start),
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ));
+      }
+
+      // Add the matched text (inside **) with bold styling
+      textSpans.add(TextSpan(
+        text: match.group(1), // Extract the text inside **
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold, // Apply bold style
+        ),
+      ));
+
+      lastEnd = match.end;
+    });
+
+    // Add any remaining text after the last match
+    if (lastEnd < message.length) {
+      textSpans.add(TextSpan(
+        text: message.substring(lastEnd),
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ));
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5),
+      child: Align(
+        alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+        child: Material(
+          borderRadius: BorderRadius.circular(20),
+          color: isUser ? Colors.purple : Colors.blueAccent,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            child: RichText(
+              text: TextSpan(children: textSpans),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -152,14 +221,11 @@ Give me a complete and accurate ingredient list in a structured, easy-to-read fo
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.purple,
-        title: Text(
-          'You Calorie Friend',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+        title: Text('Your Calorie Friend',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        actions: [
+          IconButton(icon: Icon(Icons.refresh), onPressed: startNewChat)
+        ],
       ),
       body: Column(
         children: [
@@ -169,74 +235,29 @@ Give me a complete and accurate ingredient list in a structured, easy-to-read fo
               itemCount: messages.length + (_isLoading ? 1 : 0),
               itemBuilder: (context, index) {
                 if (_isLoading && index == messages.length) {
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5),
-                      child: Material(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.blueAccent,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          child: Text(
-                            "Thinking...",
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
+                  return Center(child: CircularProgressIndicator());
                 }
-
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Align(
-                    alignment: index == 0 || index.isEven
-                        ? Alignment.centerLeft
-                        : Alignment.centerRight,
-                    child: Material(
-                      borderRadius: BorderRadius.circular(20),
-                      color: index == 0 || index.isEven
-                          ? Colors.blueAccent
-                          : Colors.purple,
-                      child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                        child: Text(
-                          messages[index],
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
+                return _buildMessage(messages[index], index.isOdd);
               },
             ),
           ),
-
-          // ✅ Checkboxes for ingredients
-          if (ingredientList.isNotEmpty)
+          if (_showCheckboxes)
             Expanded(
               child: ListView.builder(
                 itemCount: ingredientList.length,
                 itemBuilder: (context, index) {
                   return CheckboxListTile(
-                    title:
-                        Text(ingredientList[index]['name']), // Ingredient name
-                    value: ingredientList[index]['selected'], // Checkbox state
+                    title: Text(ingredientList[index]['name']),
+                    value: ingredientList[index]['selected'],
                     onChanged: (bool? value) {
                       setState(() {
                         ingredientList[index]['selected'] = value!;
                         if (value) {
-                          selectedIngredients.add(ingredientList[index]
-                              ['name']); // ✅ Add selected ingredient
+                          selectedIngredients
+                              .add(ingredientList[index]['name']);
                         } else {
-                          selectedIngredients.remove(ingredientList[index]
-                              ['name']); // ✅ Remove if unchecked
+                          selectedIngredients
+                              .remove(ingredientList[index]['name']);
                         }
                       });
                     },
@@ -244,7 +265,35 @@ Give me a complete and accurate ingredient list in a structured, easy-to-read fo
                 },
               ),
             ),
-
+          if (_showCalorieOptions)
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        adjustCalories('increase');
+                      },
+                      child: Text('Increase Calories'),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        adjustCalories('decrease');
+                      },
+                      child: Text('Decrease Calories'),
+                      style:
+                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Padding(
             padding: EdgeInsets.all(8.0),
             child: Row(
@@ -254,21 +303,17 @@ Give me a complete and accurate ingredient list in a structured, easy-to-read fo
                     controller: _controller,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: Colors.grey[200],
                       hintText: 'Type a dish name...',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none),
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: sendMessage,
-                  color: Colors.purple,
-                ),
+                    icon: Icon(Icons.send),
+                    onPressed: sendMessage,
+                    color: Colors.purple),
               ],
             ),
           ),

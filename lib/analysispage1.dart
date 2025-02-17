@@ -62,8 +62,8 @@ class AnalysisPage1 extends StatelessWidget {
 
   List<TextSpan> _parseMarkdownToSpans(String text) {
     final List<TextSpan> spans = [];
-    final regex = RegExp(r'\*\*(.*?)\*\*');
-    int startIndex = 0;
+      final regex = RegExp(r'\*\*(.*?)\*\*');
+      int startIndex = 0;
 
     for (final match in regex.allMatches(text)) {
       if (match.start > startIndex) {

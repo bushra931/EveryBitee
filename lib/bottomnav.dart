@@ -21,14 +21,14 @@ class CustomBottomNavBar extends StatelessWidget {
           icon: Icon(Icons.home),
           label: 'Home',
         ),
-        BottomNavigationBarItem(
-          icon: SizedBox(
-            height: 50,
-            // Adjust the size of the image
-            child: Image.asset('assets/image/samwich.png'),
-          ),
-          label: '', // No label for the image
-        ),
+        // BottomNavigationBarItem(
+        //   icon: SizedBox(
+        //     height: 50,
+        //     // Adjust the size of the image
+        //     child: Image.asset('assets/image/samwich.png'),
+        //   ),
+        //   label: '', // No label for the image
+        // ),
         const BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: 'Profile',
