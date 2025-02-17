@@ -82,12 +82,15 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     }
   }
-void navigateToChatScreen(BuildContext context) {
+
+  void navigateToChatScreen(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ChatScreen()), // ChatScreen is your chat screen
+      MaterialPageRoute(
+          builder: (context) => ChatScreen()), // ChatScreen is your chat screen
     );
   }
+
   void navigateToHomePage(BuildContext context) {
     Navigator.pushReplacement(
       context,
@@ -167,7 +170,8 @@ void navigateToChatScreen(BuildContext context) {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 2, // Profile Tab Index
         navigateToHomePage: () => navigateToHomePage(context),
-        navigateToProfilePage: () => navigateToProfilePage(context),  navigateToScanPage: () => navigateToChatScreen(context),
+        navigateToProfilePage: () => navigateToProfilePage(context),
+        navigateToScanPage: () => navigateToChatScreen(context),
       ),
     );
   }

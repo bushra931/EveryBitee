@@ -23,21 +23,22 @@ class CustomBottomNavBar extends StatelessWidget {
         ),
         // BottomNavigationBarItem(
         //   icon: SizedBox(
-        //     height: 50,
+        //     height: 20,
         //     // Adjust the size of the image
         //     child: Image.asset('assets/image/samwich.png'),
         //   ),
         //   label: '', // No label for the image
         // ),
+         BottomNavigationBarItem(
+          icon: Icon(Icons.fastfood), // Icon for food
+          label: 'Scan', // You can change the label to anything suitable
+        ),
         const BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: 'Profile',
         ),
         // New button to navigate to scan page
-        BottomNavigationBarItem(
-          icon: Icon(Icons.fastfood), // Icon for food
-          label: 'Scan', // You can change the label to anything suitable
-        ),
+       
       ],
       currentIndex: currentIndex,
       selectedItemColor: Colors.green,
@@ -57,11 +58,12 @@ class CustomBottomNavBar extends StatelessWidget {
       case 0: // Navigate to Home
         navigateToHomePage();
         break;
-      case 2: // Navigate to Profile
-        navigateToProfilePage();
+      case 1:
+       navigateToScanPage(); // Navigate to Profile
+        
         break;
-      case 3: // Navigate to Scan page (your new screen)
-        navigateToScanPage();
+      case 2: // Navigate to Scan page (your new screen)
+       navigateToProfilePage();
         break;
       default:
         // No action for index 1 (Image)

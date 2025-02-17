@@ -466,7 +466,7 @@ Please use markdown to format the response.
         currentIndex: 0, // Set index as needed
         navigateToHomePage:
             () {}, // Modify as per your existing navigation logic
-        navigateToProfilePage: () {},
+        navigateToProfilePage: () => navigateToProfilePage(context),
         navigateToScanPage: () => navigateToChatScreen(context),
       ),
     );
