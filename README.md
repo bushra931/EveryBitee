@@ -1,16 +1,40 @@
-# everybite
+# EveryBite
 
-A new Flutter project.
+A Flutter app that helps users make healthier and eco-conscious food choices through AI-powered food label scanning and personalized insights.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## Demo & Code
 
-A few resources to get you started if this is your first Flutter project:
+- [Demo Video](https://youtu.be/h5BtAH1u0sE)
+- [GitHub Repo](https://github.com/bushra931/EveryBitee)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Features
+
+- Barcode & OCR scanning for food info
+- Personalized suggestions based on diet/allergies
+- NutriScore & EcoScore ratings
+- Calorie tracking with healthier alternatives
+
+---
+
+## Tech Stack
+
+- Flutter, Firebase, Open Food Facts API, Gemini API
+
+---
+
+## Future Additions
+
+- Expiry tracking
+- OCR-only scan mode
+- Eco impact comparisons
+- Cultural diet support
+
+---
+
+## Contact
+
+Contribute or raise issues on [GitHub](https://github.com/bushra931/EveryBitee)

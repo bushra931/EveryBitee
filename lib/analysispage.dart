@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AnalysisPage extends StatelessWidget {
   final Map<String, dynamic> productData;
   final String analysisResult;
+// final Map<String, dynamic> productData;
+//   final String analysisResult;
 
   const AnalysisPage({
     super.key,
